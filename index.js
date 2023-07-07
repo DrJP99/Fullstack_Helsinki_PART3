@@ -58,6 +58,41 @@ app.delete("/api/persons/:id", (req, res) => {
 	res.status(204).end();
 });
 
+const generateId = () => {
+	let new_id = 1;
+	let unique = false;
+	while (!unique) {
+		new_id = Math.floor(Math.random() * 10000);
+		unique = persons.find((p) => p.id === new_id) ? false : true;
+	}
+	return new_id;
+};
+
+app.post("/api/persons", (req, res) => {
+	const body = req.body;
+
+	if (!body.name || !body.number) {
+		return res.status(400).json({
+			error: "name or number missing",
+		});
+	}
+
+	if (persons.find((p) => p.name === body.name)) {
+		return res.status(400).json({
+			error: "name must be unique",
+		});
+	}
+
+	const person = {
+		id: generateId(),
+		name: body.name,
+		phone: body.number,
+	};
+
+	persons = persons.concat(person);
+	res.json(person);
+});
+
 const PORT = 3001;
 app.listen(PORT);
 console.log(`Server running on PORT ${PORT}`);
