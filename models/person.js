@@ -23,7 +23,14 @@ const personSchema = new mongoose.Schema({
 	},
 	number: {
 		type: String,
-		required: true,
+		minLength: 8,
+		validate: {
+			validator: (v) => {
+				return /(\d{2}|\d{3})-\d*/.test(v);
+			},
+			message: (props) =>
+				`${props.value} must had 2 or 3 numbers, a dash and other numbers`,
+		},
 	},
 });
 
