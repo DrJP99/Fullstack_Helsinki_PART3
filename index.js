@@ -1,20 +1,15 @@
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
+const cors = require("cors");
+
+app.use(express.static("build"));
+app.use(cors());
 
 app.use(express.json());
 
 morgan.token("body", (req) => {
-	console.log(req.body);
-	const string_object = (obj) => {
-		let res = "{";
-		res += Object.entries(obj)
-			.map(([k, v]) => `"${k}" : "${v}"`)
-			.join(", ");
-		res += "}";
-		return res;
-	};
-	return string_object(req.body);
+	return JSON.stringify(req.body);
 });
 
 app.use(
@@ -49,7 +44,6 @@ let persons = [
 app.get("/info", (req, res) => {
 	const n = persons.length;
 	const now = new Date();
-	console.log(now);
 	const info = `
         <p>Phonebook has info for ${n} people</p>
         <p>${now}</p>
@@ -106,13 +100,13 @@ app.post("/api/persons", (req, res) => {
 	const person = {
 		id: generateId(),
 		name: body.name,
-		phone: body.number,
+		number: body.number,
 	};
 
 	persons = persons.concat(person);
 	res.json(person);
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT);
 console.log(`Server running on PORT ${PORT}`);
